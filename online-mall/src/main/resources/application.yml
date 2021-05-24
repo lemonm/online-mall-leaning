@@ -12,3 +12,28 @@ spring:
     port: 12079
     password:
     database: 0
+
+token:
+  header: Authorization #自定义token标识
+  secret: zaqwsxcderfvbgtyhnmjuiklop #密钥
+  expireTime: 3600000 #过期时间(30分钟)
+
+secure:
+  ignored:
+    urls: #安全路径白名单
+      - /swagger-ui.html
+      - /swagger-resources/**
+      - /swagger/**
+      - /**/v2/api-docs
+      - /**/*.js
+      - /**/*.css
+      - /**/*.png
+      - /**/*.ico
+      - /webjars/springfox-swagger-ui/**
+      - /actuator/**
+      - /druid/**
+      - /admin/login
+      - /admin/register
+      - /admin/info
+      - /admin/logout
+      - /minio/upload
