@@ -3,19 +3,23 @@ package com.lemon.onlinemall.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.service.ApiInfo;
+import springfox.documentation.service.ApiKey;
+import springfox.documentation.service.AuthorizationScope;
+import springfox.documentation.service.SecurityReference;
 import springfox.documentation.spi.DocumentationType;
+import springfox.documentation.spi.service.contexts.SecurityContext;
 import springfox.documentation.spring.web.plugins.Docket;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Configuration
 public class Swagger2Config {
 
-    //访问http://localhost:8083/swagger-ui.html可以看到API文档
     @Bean
     public Docket api() {
         return new Docket(DocumentationType.SWAGGER_2)
@@ -23,7 +27,9 @@ public class Swagger2Config {
                 .select()
                 .apis(RequestHandlerSelectors.any())
                 .paths(PathSelectors.any())
-                .build();
+                .build()
+                .securitySchemes(securitySchemes())
+                .securityContexts(securityContexts());
     }
 
     private ApiInfo apiInfo() {
@@ -32,5 +38,28 @@ public class Swagger2Config {
                 .description("")
                 .termsOfServiceUrl("")
                 .build();
+    }
+
+    private List<SecurityContext> securityContexts() {
+        List<SecurityContext> securityContextList = new ArrayList<>();
+        List<SecurityReference> securityReferenceList = new ArrayList<>();
+        securityReferenceList.add(new SecurityReference("custom-token", scopes()));
+        securityContextList.add(SecurityContext
+                .builder()
+                .securityReferences(securityReferenceList)
+                .forPaths(PathSelectors.any())
+                .build()
+        );
+        return securityContextList;
+    }
+
+    private AuthorizationScope[] scopes() {
+        return new AuthorizationScope[]{new AuthorizationScope("global", "accessAnything")};
+    }
+
+    private List<ApiKey> securitySchemes() {
+        List<ApiKey> apiKeyList = new ArrayList<>();
+        apiKeyList.add(new ApiKey("custom-token", "custom-token", "header"));
+        return apiKeyList;
     }
 }
